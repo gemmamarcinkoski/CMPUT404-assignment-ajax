@@ -6,7 +6,7 @@
     <meta content='width=device-width; height=device-height; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;' name='viewport' />
     <meta name="viewport" content="width=device-width" />
     <meta name="license" content="
-        Copyright 2013 Abram Hindle
+        Copyright 2013 Abram Hindle, Falon Scheers
         
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
         if (xhr.readyState==4) {
             try {
                 if (xhr.status==200) {
-                    //XXX: parse some JSON from the request!
+                    //parsing JSON from the request!
                     parsed = JSON.parse(xhr.responseText);
-                    //XXX: Pass the data to the callback!
+                    //Pass the data to the callback!
                     callback(parsed);
                 }
             } 
@@ -49,9 +49,8 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
             }
         }
     };
-    //XXX: POST to a URL
-    //XXX: set the mimetype and the accept headers!
-    // Remember to use application/json !
+    //POST to a URL
+    //set the mimetype and the accept headers!
     if (objects){ //POST
         xhr.open('POST', url);
         xhr.overrideMimeType('application/json');
@@ -68,7 +67,6 @@ function sendJSONXMLHTTPRequest(url, objects, callback) {
 
 world = {};
 
-//XXX: TODO Make this prettier!
 function drawCircle(context,entity) {
     with(context) {
         beginPath();              
@@ -76,14 +74,14 @@ function drawCircle(context,entity) {
         var x = entity["x"];
         var y = entity["y"];
         
-        for (var i=11; i !=0; i--){
-            var r = entity['radius']*(i%2+1)/2;
-            var ang = ((2*Math.PI)/10)*i;
-            lineTo((r*Math.sin(ang))+x, (r*Math.cos(ang))+y);
+            for (var i=11; i !=0; i--){
+                var r = entity["radius"]*(i % 2 + 1)/2;
+                var ang = ((2 * Math.PI)/10)*i;
+                lineTo((r * Math.sin(ang)) + x, (r * Math.cos(ang))+y);
         }
-        closePath();
-        fillStyle = entity["colour"];
-        fill();
+                closePath();
+                fillStyle = entity["colour"];
+                fill();
         
         
         
@@ -108,9 +106,9 @@ function prepEntity(entity) {
 
 function clearFrame() {
     with(context) {
-	moveTo(0,0);
-	fillStyle = "#000";
-	fillRect(0,0,W,H);
+	   moveTo(0,0);
+	   fillStyle = "#000";
+	   fillRect(0,0,W,H);
     }
 
 }
@@ -162,11 +160,9 @@ function getPosition(e) {
 
 function addEntity(entity, data) {
     world[entity] = data;
-    //XXX: Send a XHTML Request that updates the entity you just  modified!
-    sendJSONXMLHTTPRequest('/entity/' + entity, data, function(data){});
-    drawNextFrame(); // (but should we?)
-    
-
+    //Sending a XHTML Request that updates the entity you just  modified!
+        sendJSONXMLHTTPRequest('/entity/'+ entity, data, function(data){});
+        drawNextFrame(); // signaling there is something to draw
 }
 
 var counter = 0;
@@ -213,8 +209,8 @@ mouse = (function() {
                 var x = pos[0];
                 var y = pos[1];
 	        self.clicked = 1;
-                self.callListeners(self.mousedowners,x,y,self.clicked,e);
-                //addEntityWithoutName({'x':x,'y':y,'colour':'red'});
+            self.callListeners(self.mousedowners,x,y,self.clicked,e);
+            //addEntityWithoutName({'x':x,'y':y,'colour':'red'});
             }
         },
         mouseup: function(e) {
@@ -225,7 +221,7 @@ mouse = (function() {
                 var x = pos[0];
                 var y = pos[1];
 	        //self.poppin(x,y);
-	        self.clicked = 0;
+                self.clicked = 0;
                 self.selected = -1;
                 self.callListeners(self.mouseuppers,x,y,self.clicked,e);
                 //addEntityWithoutName({'x':x,'y':y,'colour':'blue'});
@@ -235,11 +231,11 @@ mouse = (function() {
             self.lasttouch = e;                                         
             return self.mousedown(e);
         },
-	touchend: function(e) {
+	   touchend: function(e) {
             var touch = (self.lasttouch)?self.lasttouch:e;
             return self.mouseup(touch);
-	},
-	mousemove: function(e) {
+	   },
+	   mousemove: function(e) {
             e.preventDefault();
             if (self.wasClicked(e)) {
                 var pos = getPosition(e);
@@ -276,38 +272,37 @@ mouse = (function() {
 //ref http://www.paulirish.com/2009/random-hex-color-code-snippets/
 function randColor(){
     return '#' + (function co(lor){
-        return (lor +=[0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'][Math.floor(Math.random()*16)]) && (lor.length==6) ? lor : co(lor); })('');
+        return (lor +=[0,1,2,3,4,5,6,7,8,9,'a','b','c','d','e','f'][Math.floor(Math.random()*16)]) && (lor.length == 6) ?  lor : co(lor); })('');
     }
 }
         
 
 
-// Add the application specific mouse listeners!
-//XXX: TODO Make these prettier!
+// Added the application specific mouse listeners!
 mouse.mousedowners.push(function(x,y,clicked,e) {
-    rco = randColor();
+        rco = randColor();
     addEntityWithoutName({'x':x,'y':y,'colour':rco});
 });
 
 mouse.mouseuppers.push(function(x,y,clicked,e) {
-    rco = randColor();
+        rco = randColor();
     addEntityWithoutName({'x':x,'y':y,'colour':rco});
 });
 
 mouse.mousedraggers.push(function(x,y,clicked,e) {
-    rcom = randColor();
+        rco = randColor();
     addEntityWithoutName({'x':x,'y':y,'colour':rco,
                           'radius':10});
 });
 
 
 function update() {
-    //XXX: TODO Get the world from the webservice using a XMLHTTPRequest
+    //Get the world from the webservice using a XMLHTTPRequest
     sendJSONXMLHTTPRequest('/world', null, function(data){
         //updating our world with what we got
         world = data;
         //continue drawing
-        drawNextFrame();
+            drawNextFrame();
     });
     drawFrame();
 }
